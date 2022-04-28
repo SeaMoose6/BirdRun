@@ -62,31 +62,39 @@ class SpriteSheet:
         return self.images_at(sprite_rects, colorkey)
 
 
-class Player:
+class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, sheet):
         pygame.sprite.Sprite.__init__(self)
+        self.surface = sheet.image_at((0, 95, 47, 47), -1)
+        self.rect = self.surface.get_rect()
+        self.rect.x = x
+        self.rect.y = y
         self.run = [sheet.image_at((0, 95, 47, 47), -1), sheet.image_at((47, 95, 47, 47), -1)]
         self.running = False
+        self.dodging_up = False
+        self.dodging_down = False
+
 
 
 class Layout:
-    class Level:
-        def __init__(self, layout, sheet):
-            pygame.sprite.Sprite.__init__(self)
-            self.layout = layout
-            self.player_grp = pygame.sprite.GroupSingle()
-            self.all_sprites = pygame.sprite.Group()
+    def __init__(self, sheet):
+        pygame.sprite.Sprite.__init__(self)
+        self.layout = LAYOUT
+        self.player_grp = pygame.sprite.GroupSingle()
+        self.all_sprites = pygame.sprite.Group()
 
-            for i, row in enumerate(self.layout):
-                for j, col in enumerate(row):
-                    x_val = j * TILE_SIZE
-                    y_val = i * TILE_SIZE
+        for i, row in enumerate(self.layout):
+            for j, col in enumerate(row):
+                x_val = j * TILE_SIZE
+                y_val = i * 81 + 50
 
-                    if col == "P":
-                        player = Player(x_val, y_val, sheet)
-                        self.player_grp.add(player)
-                        self.all_sprites.add(player)
+                if col == "P":
+                    player = Player(x_val, y_val, sheet)
+                    print(player.rect.x, player.rect.y)
+                    self.player_grp.add(player)
+                    self.all_sprites.add(player)
 
-        def update(self, display):
-            for sprite in self.all_sprites.sprites():
-                display.blit(sprite.surface, sprite.rect)
+    def update(self, display):
+        for sprite in self.all_sprites.sprites():
+            display.blit(sprite.surface, sprite.rect)
+            #print(sprite.rect.x, sprite.rect.y)

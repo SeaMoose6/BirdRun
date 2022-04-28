@@ -9,8 +9,8 @@ pygame.display.set_caption("The Beach")
 
 clock = pygame.time.Clock()
 running = True
-
-layout = sprites.Layout()
+players = sprites.SpriteSheet("assets/$euphus_young.png")
+layout = sprites.Layout(players)
 
 while running:
 
