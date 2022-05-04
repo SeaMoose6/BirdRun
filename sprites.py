@@ -83,7 +83,6 @@ class Player(pygame.sprite.Sprite):
         self.display = display
 
     def update(self):
-        print("true")
         now = pygame.time.get_ticks()
         if now - self.previous_update >= self.image_delay:
             self.previous_update = now
@@ -93,6 +92,25 @@ class Player(pygame.sprite.Sprite):
             self.frame = self.frame + 1
         self.display.blit(self.image, (self.rect.x, self.rect.y))
 
+    def get_keys(self, time):
+        self.time = time
+        keys = pygame.key.get_pressed()
+        current_move = pygame.time.get_ticks()
+        if current_move - self.time > move_delay:
+            self.time = current_move
+            print(current_move - self.time)
+
+            if keys[pygame.K_s] and self.rect.y < 1750:
+                self.rect.y += 65
+            if keys[pygame.K_w] and self.rect.y > 0:
+                self.rect.y -= 65
+class Car(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.red_car = pygame.image.load("assets/sedanSports_S.png")
+        self.image = self.red_car
+        self.rect = self.image.get_rect()
+
 
 
 class Layout:
@@ -101,6 +119,7 @@ class Layout:
         self.layout = LAYOUT
         self.display = display
         self.player_grp = pygame.sprite.GroupSingle()
+        self.car_grp = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
 
         for i, row in enumerate(self.layout):
@@ -111,10 +130,16 @@ class Layout:
                 if col == "P":
                     player = Player(x_val, y_val, sheet, True, self.display)
                     self.player_grp.add(player)
-                    #self.all_sprites.add(player)
+                if col == "C":
+                    car = Car()
+                    self.car_grp.add(car)
+                    self.all_sprites.add(car)
 
-    def update(self, display):
+
+
+    def update(self, display, time):
         for sprite in self.all_sprites.sprites():
             display.blit(sprite.surface, sprite.rect)
         for player in self.player_grp.sprites():
             player.update()
+            player.get_keys(time)

@@ -15,6 +15,8 @@ running = True
 players = sprites.SpriteSheet("assets/$euphus_young.png")
 layout = sprites.Layout(players, screen)
 
+previous_movement = pygame.time.get_ticks()
+
 while running:
 
     for event in pygame.event.get():
@@ -23,7 +25,7 @@ while running:
 
     screen.blit(bg_image, (0, 0))
 
-    layout.update(screen)
+    layout.update(screen, previous_movement)
 
     pygame.display.flip()
 
