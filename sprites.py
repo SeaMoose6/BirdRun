@@ -95,21 +95,26 @@ class Player(pygame.sprite.Sprite):
     def get_keys(self, time):
         self.time = time
         keys = pygame.key.get_pressed()
-        current_move = pygame.time.get_ticks()
-        if current_move - self.time > move_delay:
-            self.time = current_move
-            print(current_move - self.time)
+        self.current_move = pygame.time.get_ticks()
+        if self.current_move - self.time > move_delay:
+            self.time = self.current_move
 
-            if keys[pygame.K_s] and self.rect.y < 1750:
+            if keys[pygame.K_s] and self.rect.y < 564:
                 self.rect.y += 65
-            if keys[pygame.K_w] and self.rect.y > 0:
+            if keys[pygame.K_w] and self.rect.y > 150:
                 self.rect.y -= 65
 class Car(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, x, y, display):
         pygame.sprite.Sprite.__init__(self)
         self.red_car = pygame.image.load("assets/sedanSports_S.png")
+        self.rect = self.red_car.get_rect()
         self.image = self.red_car
-        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        print(x, y)
+        display.blit(self.image, (self.rect.x, self.rect.y))
+
+
 
 
 
@@ -131,9 +136,9 @@ class Layout:
                     player = Player(x_val, y_val, sheet, True, self.display)
                     self.player_grp.add(player)
                 if col == "C":
-                    car = Car()
+                    car = Car(x_val, y_val, self.display)
                     self.car_grp.add(car)
-                    self.all_sprites.add(car)
+                    #self.all_sprites.add(car)
 
 
 
