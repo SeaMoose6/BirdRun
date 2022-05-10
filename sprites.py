@@ -62,6 +62,36 @@ class SpriteSheet:
         return self.images_at(sprite_rects, colorkey)
 
 
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, sheet, center):
+        pygame.sprite.Sprite.__init__(self)
+        self.sheet = sheet
+        self.EXPLOSION_LIST = [self.sheet.image_at((0, 0, 31, 31), -1), self.sheet.image_at((32, 0, 31, 31), -1),
+                               self.sheet.image_at((65, 0, 31, 31), -1), self.sheet.image_at((96, 0, 31, 31), -1),
+                               self.sheet.image_at((128, 0, 31, 31), -1), self.sheet.image_at((160, 0, 31, 31), -1)]
+        self.EXPLOSION_LIST = [pygame.transform.scale2x(explosion) for explosion in self.EXPLOSION_LIST]
+        self.image = self.EXPLOSION_LIST[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.frame = 0
+        self.frame_rate = 50
+        self.kill_center = center
+        self.previous_update = pygame.time.get_ticks()
+
+    def update(self):
+        current = pygame.time.get_ticks()
+        if current - self.previous_update > self.frame_rate:
+            self.previous_update = current
+            self.frame += 1
+        elif self.frame == len(self.EXPLOSION_LIST):
+            self.kill()
+        else:
+            self.image = self.EXPLOSION_LIST[self.frame]
+            self.rect = self.image.get_rect()
+            self.rect.center = self.kill_center
+
+
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, sheet, running, display):
         pygame.sprite.Sprite.__init__(self)
@@ -71,8 +101,8 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.surface.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.run = [sheet.image_at((0, 95, 47, 47), -1), sheet.image_at((47, 95, 47, 47), -1)]
-        self.run = [pygame.transform.scale(player, (250, 250)) for player in self.run]
+        self.run = [sheet.image_at((10, 110, 32, 30), -1), sheet.image_at((57, 110, 32, 30), -1)]
+        self.run = [pygame.transform.scale(player, (150, 150)) for player in self.run]
         self.frame = 0
         self.frame_rate = 50
         self.previous_update = pygame.time.get_ticks()
@@ -107,19 +137,21 @@ class Car(pygame.sprite.Sprite):
     def __init__(self, x, y, display):
         pygame.sprite.Sprite.__init__(self)
         self.red_car = pygame.image.load("assets/sedanSports_S.png")
+        #self.red_car = SpriteSheet("assets/sedanSports_S.png")
+        #self.red_car = self.red_car.image_at((50, 50, 100, 100))
         self.rect = self.red_car.get_rect()
         self.image = self.red_car
         self.rect.x = x
         self.rect.y = y
-        print(x, y)
-        display.blit(self.image, (self.rect.x, self.rect.y))
-
-
-
+        self.display = display
+    def update(self):
+        #self.rect.x -= 15
+        #self.image.fill(RED)
+        self.display.blit(self.image, (self.rect.x, self.rect.y))
 
 
 class Layout:
-    def __init__(self, sheet, display):
+    def __init__(self, sheet, display, sheet_2):
         pygame.sprite.Sprite.__init__(self)
         self.layout = LAYOUT
         self.display = display
@@ -130,7 +162,7 @@ class Layout:
         for i, row in enumerate(self.layout):
             for j, col in enumerate(row):
                 x_val = j * TILE_SIZE
-                y_val = i * 75 - 6
+                y_val = i * 75
 
                 if col == "P":
                     player = Player(x_val, y_val, sheet, True, self.display)
@@ -138,9 +170,6 @@ class Layout:
                 if col == "C":
                     car = Car(x_val, y_val, self.display)
                     self.car_grp.add(car)
-                    #self.all_sprites.add(car)
-
-
 
     def update(self, display, time):
         for sprite in self.all_sprites.sprites():
@@ -148,3 +177,20 @@ class Layout:
         for player in self.player_grp.sprites():
             player.update()
             player.get_keys(time)
+        for car in self.car_grp.sprites():
+            car.update()
+
+        #self.collied()
+
+    def collied(self):
+        touched = False
+        player = self.player_grp.sprite
+
+        collide_list = pygame.sprite.spritecollide(player, self.car_grp, False)
+        if collide_list:
+            touched = True
+            player.rect.y += 2000
+            print("YEH")
+        return touched, player.rect.center
+
+

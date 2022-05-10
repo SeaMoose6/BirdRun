@@ -13,7 +13,9 @@ pygame.display.set_caption("Bird Run")
 clock = pygame.time.Clock()
 running = True
 players = sprites.SpriteSheet("assets/$euphus_young.png")
-layout = sprites.Layout(players, screen)
+explosion_sheet = sprites.SpriteSheet("assets/explosion.png")
+explosion_group = pygame.sprite.Group()
+layout = sprites.Layout(players, screen, explosion_sheet)
 
 previous_movement = pygame.time.get_ticks()
 
@@ -26,6 +28,11 @@ while running:
     screen.blit(bg_image, (0, 0))
 
     layout.update(screen, previous_movement)
+    if layout.collied()[0]:
+        explosion = sprites.Explosion(explosion_sheet, layout.collied()[1])
+        explosion_group.add(explosion)
+
+    #explosion_group.draw(screen)
 
     pygame.display.flip()
 
