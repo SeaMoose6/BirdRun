@@ -4,7 +4,7 @@ from settings import *
 
 pygame.init()
 
-bg_image = pygame.image.load("assets/background-1 (1).png")
+bg_image = pygame.image.load("assets/background_no_signs.png")
 bg_image = pygame.transform.scale(bg_image, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
 
 screen = pygame.display.set_mode(SIZE)

@@ -120,6 +120,7 @@ class Player(pygame.sprite.Sprite):
                 self.frame = 0
             self.image = self.run[self.frame]
             self.frame = self.frame + 1
+        #self.image.fill(BLUE)
         self.display.blit(self.image, (self.rect.x, self.rect.y))
 
     def get_keys(self, time):
@@ -129,23 +130,28 @@ class Player(pygame.sprite.Sprite):
         if self.current_move - self.time > move_delay:
             self.time = self.current_move
 
-            if keys[pygame.K_s] and self.rect.y < 564:
+            if keys[pygame.K_s] and self.rect.y < 636:
                 self.rect.y += 65
-            if keys[pygame.K_w] and self.rect.y > 150:
+            if keys[pygame.K_w] and self.rect.y > 180:
                 self.rect.y -= 65
+
+
 class Car(pygame.sprite.Sprite):
-    def __init__(self, x, y, display):
+    def __init__(self, x, y, display, color):
         pygame.sprite.Sprite.__init__(self)
-        self.red_car = pygame.image.load("assets/sedanSports_S.png")
-        #self.red_car = SpriteSheet("assets/sedanSports_S.png")
-        #self.red_car = self.red_car.image_at((50, 50, 100, 100))
+        self.red_car = pygame.image.load("assets/red car.png")
+        self.teal_car = pygame.image.load("assets/teal car.png")
         self.rect = self.red_car.get_rect()
-        self.image = self.red_car
+        if color == "R":
+            self.image = self.red_car
+        if color == "T":
+            self.image = self.teal_car
         self.rect.x = x
         self.rect.y = y
         self.display = display
+
     def update(self):
-        #self.rect.x -= 15
+        self.rect.x -= 15
         #self.image.fill(RED)
         self.display.blit(self.image, (self.rect.x, self.rect.y))
 
@@ -167,8 +173,11 @@ class Layout:
                 if col == "P":
                     player = Player(x_val, y_val, sheet, True, self.display)
                     self.player_grp.add(player)
-                if col == "C":
-                    car = Car(x_val, y_val, self.display)
+                if col == "R":
+                    car = Car(x_val, y_val, self.display, col)
+                    self.car_grp.add(car)
+                if col == "T":
+                    car = Car(x_val, y_val, self.display, col)
                     self.car_grp.add(car)
 
     def update(self, display, time):
