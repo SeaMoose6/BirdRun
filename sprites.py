@@ -120,7 +120,7 @@ class Player(pygame.sprite.Sprite):
                 self.frame = 0
             self.image = self.run[self.frame]
             self.frame = self.frame + 1
-        #self.image.fill(BLUE)
+        self.image.fill(BLUE)
         self.display.blit(self.image, (self.rect.x, self.rect.y))
 
     def get_keys(self, time):
@@ -134,24 +134,44 @@ class Player(pygame.sprite.Sprite):
                 self.rect.y += 65
             if keys[pygame.K_w] and self.rect.y > 180:
                 self.rect.y -= 65
+        #print(self.rect.y)
 
 
 class Car(pygame.sprite.Sprite):
-    def __init__(self, x, y, display, color):
+    def __init__(self, x, y, display, color, speed):
         pygame.sprite.Sprite.__init__(self)
         self.red_car = pygame.image.load("assets/red car.png")
         self.teal_car = pygame.image.load("assets/teal car.png")
+        self.white_car = pygame.image.load("assets/truckFlat.png")
+        self.violet_car = pygame.image.load("assets/van.png")
+        self.yellow_car = pygame.image.load("assets/taxi.png")
+        self.cop_car = pygame.image.load("assets/police.png")
+        self.fast_car = pygame.image.load("assets/raceFuture.png")
+        self.health_car = pygame.image.load("assets/ambulance.png")
         self.rect = self.red_car.get_rect()
+        self.speed = speed
         if color == "R":
             self.image = self.red_car
         if color == "T":
             self.image = self.teal_car
+        if color == "W":
+            self.image = self.white_car
+        if color == "V":
+            self.image = self.violet_car
+        if color == "Y":
+            self.image = self.yellow_car
+        if color == "C":
+            self.image = self.cop_car
+        if color == "F":
+            self.image = self.fast_car
+        if color == "H":
+            self.image = self.health_car
         self.rect.x = x
         self.rect.y = y
         self.display = display
 
     def update(self):
-        self.rect.x -= 15
+        self.rect.x -= self.speed
         #self.image.fill(RED)
         self.display.blit(self.image, (self.rect.x, self.rect.y))
 
@@ -174,10 +194,28 @@ class Layout:
                     player = Player(x_val, y_val, sheet, True, self.display)
                     self.player_grp.add(player)
                 if col == "R":
-                    car = Car(x_val, y_val, self.display, col)
+                    car = Car(x_val, y_val, self.display, col, 22)
                     self.car_grp.add(car)
                 if col == "T":
-                    car = Car(x_val, y_val, self.display, col)
+                    car = Car(x_val, y_val, self.display, col, 18)
+                    self.car_grp.add(car)
+                if col == "W":
+                    car = Car(x_val, y_val, self.display, col, 15)
+                    self.car_grp.add(car)
+                if col == "V":
+                    car = Car(x_val, y_val, self.display, col, 12)
+                    self.car_grp.add(car)
+                if col == "Y":
+                    car = Car(x_val, y_val, self.display, col, 15)
+                    self.car_grp.add(car)
+                if col == "C":
+                    car = Car(x_val, y_val, self.display, col, 28)
+                    self.car_grp.add(car)
+                if col == "F":
+                    car = Car(x_val, y_val, self.display, col, 35)
+                    self.car_grp.add(car)
+                if col == "H":
+                    car = Car(x_val, y_val, self.display, col, 8)
                     self.car_grp.add(car)
 
     def update(self, display, time):
