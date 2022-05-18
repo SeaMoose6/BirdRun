@@ -1,5 +1,6 @@
 import pygame
 from settings import *
+import random
 
 
 class SpriteSheet:
@@ -96,7 +97,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, sheet, running, display):
         pygame.sprite.Sprite.__init__(self)
         self.surface = sheet.image_at((0, 95, 47, 47), -1)
-        self.surface = pygame.transform.scale(self.surface, (250, 250))
+        self.surface = pygame.transform.scale(self.surface, (150, 150))
         self.image = self.surface
         self.rect = self.surface.get_rect()
         self.rect.x = x
@@ -120,7 +121,7 @@ class Player(pygame.sprite.Sprite):
                 self.frame = 0
             self.image = self.run[self.frame]
             self.frame = self.frame + 1
-        self.image.fill(BLUE)
+        #self.image.fill(BLUE)
         self.display.blit(self.image, (self.rect.x, self.rect.y))
 
     def get_keys(self, time):
@@ -131,10 +132,9 @@ class Player(pygame.sprite.Sprite):
             self.time = self.current_move
 
             if keys[pygame.K_s] and self.rect.y < 636:
-                self.rect.y += 65
+                self.rect.y += 45
             if keys[pygame.K_w] and self.rect.y > 180:
-                self.rect.y -= 65
-        #print(self.rect.y)
+                self.rect.y -= 45
 
 
 class Car(pygame.sprite.Sprite):
@@ -176,6 +176,19 @@ class Car(pygame.sprite.Sprite):
         self.display.blit(self.image, (self.rect.x, self.rect.y))
 
 
+class Seed:
+    def __init__(self, x, y, display):
+        pygame.sprite.Sprite.__init__(self)
+        self.seed = pygame.image.load("assets/Seeds_Cereals.png")
+        self.rect = self.seed.get_rect()
+        self.display = display
+        self.rect.x = x
+        self.rect.y = y
+
+    def update(self):
+        self.display.blit(self.seed, (self.rect.x, self.rect.y))
+
+
 class Layout:
     def __init__(self, sheet, display, sheet_2):
         pygame.sprite.Sprite.__init__(self)
@@ -184,6 +197,7 @@ class Layout:
         self.player_grp = pygame.sprite.GroupSingle()
         self.car_grp = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
+        self.seed_grp = pygame.sprite.Group()
 
         for i, row in enumerate(self.layout):
             for j, col in enumerate(row):
@@ -217,6 +231,10 @@ class Layout:
                 if col == "H":
                     car = Car(x_val, y_val, self.display, col, 8)
                     self.car_grp.add(car)
+                if col == "1":
+                    if random.randint(1, 25) == 1:
+                        seed = Seed(x_val, y_val, self.display)
+                        #self.seed_grp.add(seed)
 
     def update(self, display, time):
         for sprite in self.all_sprites.sprites():
@@ -226,6 +244,8 @@ class Layout:
             player.get_keys(time)
         for car in self.car_grp.sprites():
             car.update()
+        for seed in self.seed_grp:
+            seed.update()
 
         #self.collied()
 
