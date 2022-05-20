@@ -176,17 +176,33 @@ class Car(pygame.sprite.Sprite):
         self.display.blit(self.image, (self.rect.x, self.rect.y))
 
 
-class Seed:
+class Seed(pygame.sprite.Sprite):
     def __init__(self, x, y, display):
         pygame.sprite.Sprite.__init__(self)
         self.seed = pygame.image.load("assets/Seeds_Cereals.png")
+        self.seed = pygame.transform.scale(self.seed, (75, 75))
         self.rect = self.seed.get_rect()
         self.display = display
         self.rect.x = x
         self.rect.y = y
 
     def update(self):
+        self.rect.x -= 10
         self.display.blit(self.seed, (self.rect.x, self.rect.y))
+
+
+class Score:
+    def __init__(self, font, display, score, x, y):
+        self.font = font
+        self.display = display
+        self.score = score
+        self.x = x
+        self.y = y
+
+    def draw_score(self):
+        text = self.font.render(f"Score = {self.score}", True, WHITE)
+        self.display.blit(text, (self.x, self.y))
+
 
 
 class Layout:
@@ -202,7 +218,7 @@ class Layout:
         for i, row in enumerate(self.layout):
             for j, col in enumerate(row):
                 x_val = j * TILE_SIZE
-                y_val = i * 75
+                y_val = i * 76
 
                 if col == "P":
                     player = Player(x_val, y_val, sheet, True, self.display)
@@ -234,7 +250,7 @@ class Layout:
                 if col == "1":
                     if random.randint(1, 25) == 1:
                         seed = Seed(x_val, y_val, self.display)
-                        #self.seed_grp.add(seed)
+                        self.seed_grp.add(seed)
 
     def update(self, display, time):
         for sprite in self.all_sprites.sprites():
@@ -247,17 +263,20 @@ class Layout:
         for seed in self.seed_grp:
             seed.update()
 
-        #self.collied()
-
     def collied(self):
+        score = 0
         touched = False
         player = self.player_grp.sprite
 
         collide_list = pygame.sprite.spritecollide(player, self.car_grp, False)
+        eat_list = pygame.sprite.spritecollide(player, self.seed_grp, True)
         if collide_list:
             touched = True
             player.rect.y += 2000
-            print("YEH")
-        return touched, player.rect.center
+        if eat_list:
+            score += 1
+        return touched, player.rect.center, score
+
+
 
 

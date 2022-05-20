@@ -17,6 +17,7 @@ explosion_sheet = sprites.SpriteSheet("assets/explosion.png")
 explosion_group = pygame.sprite.Group()
 layout = sprites.Layout(players, screen, explosion_sheet)
 
+
 previous_movement = pygame.time.get_ticks()
 
 while running:
@@ -32,7 +33,8 @@ while running:
         explosion = sprites.Explosion(explosion_sheet, layout.collied()[1])
         explosion_group.add(explosion)
 
-    #explosion_group.draw(screen)
+    score = sprites.Score(FONT, screen, layout.collied()[2], 50, 20)
+    score.draw_score()
 
     pygame.display.flip()
 
