@@ -206,14 +206,17 @@ class Score:
 
 
 class Layout:
-    def __init__(self, sheet, display, sheet_2):
+    def __init__(self, layout, sheet, display):
         pygame.sprite.Sprite.__init__(self)
-        self.layout = LAYOUT
+        self.layout = layout
         self.display = display
         self.player_grp = pygame.sprite.GroupSingle()
+        self.starting_car_grp = pygame.sprite.Group()
         self.car_grp = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.seed_grp = pygame.sprite.Group()
+        self.SCORE = 0
+        self.letters = ['R', 'T', 'W', 'V', 'Y', 'C', "F", 'H']
 
         for i, row in enumerate(self.layout):
             for j, col in enumerate(row):
@@ -247,6 +250,9 @@ class Layout:
                 if col == "H":
                     car = Car(x_val, y_val, self.display, col, 8)
                     self.car_grp.add(car)
+                if col == "N":
+                    car = Car(x_val, y_val, self.display, self.letters[random.randint(0, 7)], 15)
+                    self.starting_car_grp.add(car)
                 if col == "1":
                     if random.randint(1, 25) == 1:
                         seed = Seed(x_val, y_val, self.display)
@@ -260,11 +266,12 @@ class Layout:
             player.get_keys(time)
         for car in self.car_grp.sprites():
             car.update()
+        for car in self.starting_car_grp.sprites():
+            car.update()
         for seed in self.seed_grp:
             seed.update()
 
     def collied(self):
-        score = 0
         touched = False
         player = self.player_grp.sprite
 
@@ -274,8 +281,8 @@ class Layout:
             touched = True
             player.rect.y += 2000
         if eat_list:
-            score += 1
-        return touched, player.rect.center, score
+            self.SCORE += 15
+        return touched, player.rect.center, self.SCORE
 
 
 
