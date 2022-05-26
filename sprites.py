@@ -206,7 +206,7 @@ class Score:
 
 
 class Layout:
-    def __init__(self, layout, sheet, display):
+    def __init__(self, layout, sheet, display, x_multi, y_multi):
         pygame.sprite.Sprite.__init__(self)
         self.layout = layout
         self.display = display
@@ -220,8 +220,8 @@ class Layout:
 
         for i, row in enumerate(self.layout):
             for j, col in enumerate(row):
-                x_val = j * TILE_SIZE
-                y_val = i * 76
+                x_val = j * x_multi
+                y_val = i * y_multi
 
                 if col == "P":
                     player = Player(x_val, y_val, sheet, True, self.display)

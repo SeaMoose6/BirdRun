@@ -13,7 +13,7 @@ def start_screen():
     pygame.display.set_caption("Space Pirates")
     players = sprites.SpriteSheet("assets/$euphus_young.png")
 
-    layout = sprites.Layout(STARTING_LAYOUT, players, screen)
+    layout = sprites.Layout(STARTING_LAYOUT, players, screen, 50, 76)
 
     clock = pygame.time.Clock()
 
@@ -44,6 +44,33 @@ def start_screen():
         clock.tick(FPS)
 
 
+def play_tree():
+    bg_image = pygame.image.load("assets/maxresdefault.jpg")
+    bg_image = pygame.transform.scale(bg_image, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
+
+    screen = pygame.display.set_mode(SIZE)
+    pygame.display.set_caption("Bird Run")
+    players = sprites.SpriteSheet("assets/$euphus_young_fly.png")
+
+    layout = sprites.Layout(LAYOUT, players, screen, 76, 50)
+
+    clock = pygame.time.Clock()
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    running = False
+
+        screen.blit(bg_image, (0, 0))
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
 def game_over():
     screen = pygame.display.set_mode(SIZE)
     pygame.display.set_caption("Bird Run")
@@ -71,6 +98,7 @@ def game_over():
         pygame.display.flip()
         clock.tick(FPS)
 
+
 def play():
     bg_image = pygame.image.load("assets/background_no_signs.png")
     bg_image = pygame.transform.scale(bg_image, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
@@ -83,7 +111,7 @@ def play():
     players = sprites.SpriteSheet("assets/$euphus_young.png")
     explosion_sheet = sprites.SpriteSheet("assets/explosion.png")
     explosion_group = pygame.sprite.Group()
-    layout = sprites.Layout(LAYOUT, players, screen)
+    layout = sprites.Layout(LAYOUT, players, screen, 50, 76)
 
     previous_movement = pygame.time.get_ticks()
 
@@ -98,12 +126,11 @@ def play():
         score = sprites.Score(FONT, screen, layout.collied()[2], 50, 20)
 
         layout.update(screen, previous_movement)
-        if layout.collied()[0]:
-            explosion = sprites.Explosion(explosion_sheet, layout.collied()[1])
-            explosion_group.add(explosion)
 
         score.draw_score()
-        #print(score)
+
+        if layout.collied()[0]:
+            running = False
 
         pygame.display.flip()
 
@@ -114,6 +141,7 @@ start_screen()
 
 while True:
     play()
+    play_tree()
     game_over()
 
 pygame.quit()
