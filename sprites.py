@@ -152,20 +152,28 @@ class Car(pygame.sprite.Sprite):
         self.speed = speed
         if color == "R":
             self.image = self.red_car
+            self.speed = 22
         if color == "T":
             self.image = self.teal_car
+            self.speed = 18
         if color == "W":
             self.image = self.white_car
+            self.speed = 15
         if color == "V":
             self.image = self.violet_car
+            self.speed = 12
         if color == "Y":
             self.image = self.yellow_car
+            self.speed = 15
         if color == "C":
             self.image = self.cop_car
+            self.speed = 28
         if color == "F":
             self.image = self.fast_car
+            self.speed = 35
         if color == "H":
             self.image = self.health_car
+            self.speed = 8
         self.rect.x = x
         self.rect.y = y
         self.display = display
@@ -191,6 +199,21 @@ class Seed(pygame.sprite.Sprite):
         self.display.blit(self.seed, (self.rect.x, self.rect.y))
 
 
+class Tree(pygame.sprite.Sprite):
+    def __init__(self, x, y, display):
+        pygame.sprite.Sprite.__init__(self)
+        self.tree = pygame.image.load("assets/baum.png")
+        self.tree = pygame.transform.scale(self.tree, (475, 475))
+        self.rect = self.tree.get_rect()
+        self.display = display
+        self.rect.x = x
+        self.rect.y = y - 200
+
+    def update(self):
+        self.rect.x -= 10
+        self.display.blit(self.tree, (self.rect.x, self.rect.y))
+
+
 class Score:
     def __init__(self, font, display, score, x, y):
         self.font = font
@@ -203,6 +226,8 @@ class Score:
         text = self.font.render(f"Score = {self.score}", True, WHITE)
         self.display.blit(text, (self.x, self.y))
 
+    def get_score(self):
+        return self.score
 
 
 class Layout:
@@ -215,6 +240,7 @@ class Layout:
         self.car_grp = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.seed_grp = pygame.sprite.Group()
+        self.tree_grp = pygame.sprite.Group()
         self.SCORE = 0
         self.letters = ['R', 'T', 'W', 'V', 'Y', 'C', "F", 'H']
 
@@ -253,10 +279,17 @@ class Layout:
                 if col == "N":
                     car = Car(x_val, y_val, self.display, self.letters[random.randint(0, 7)], 15)
                     self.starting_car_grp.add(car)
+                if col == "G":
+                    if random.randint(1, 3) == 1 or 3:
+                        car = Car(x_val, y_val, self.display, self.letters[random.randint(0, 7)], 15)
+                        self.car_grp.add(car)
                 if col == "1":
                     if random.randint(1, 25) == 1:
                         seed = Seed(x_val, y_val, self.display)
                         self.seed_grp.add(seed)
+                if col == "2":
+                    tree = Tree(x_val, y_val, self.display)
+                    self.tree_grp.add(tree)
 
     def update(self, display, time):
         for sprite in self.all_sprites.sprites():
@@ -270,19 +303,27 @@ class Layout:
             car.update()
         for seed in self.seed_grp:
             seed.update()
+        for tree in self.tree_grp:
+            tree.update()
 
     def collied(self):
         touched = False
+        home = False
         player = self.player_grp.sprite
 
         collide_list = pygame.sprite.spritecollide(player, self.car_grp, False)
         eat_list = pygame.sprite.spritecollide(player, self.seed_grp, True)
+        for car in self.car_grp:
+            if pygame.sprite.spritecollide(car, self.car_grp, False):
+                pass
         if collide_list:
             touched = True
             player.rect.y += 2000
         if eat_list:
             self.SCORE += 15
-        return touched, player.rect.center, self.SCORE
+        if pygame.sprite.spritecollide(player, self.tree_grp, False):
+            home = True
+        return touched, player.rect.center, self.SCORE, home
 
 
 

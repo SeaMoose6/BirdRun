@@ -4,7 +4,6 @@ from settings import *
 
 pygame.init()
 
-
 def start_screen():
     bg_image = pg.image.load("assets/background_no_signs.png")
     bg_image = pg.transform.scale(bg_image, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
@@ -41,33 +40,6 @@ def start_screen():
 
         pygame.display.flip()
 
-        clock.tick(FPS)
-
-
-def play_tree():
-    bg_image = pygame.image.load("assets/maxresdefault.jpg")
-    bg_image = pygame.transform.scale(bg_image, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
-
-    screen = pygame.display.set_mode(SIZE)
-    pygame.display.set_caption("Bird Run")
-    players = sprites.SpriteSheet("assets/$euphus_young_fly.png")
-
-    layout = sprites.Layout(LAYOUT, players, screen, 76, 50)
-
-    clock = pygame.time.Clock()
-
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_p:
-                    running = False
-
-        screen.blit(bg_image, (0, 0))
-
-        pygame.display.flip()
         clock.tick(FPS)
 
 
@@ -114,6 +86,7 @@ def play():
     layout = sprites.Layout(LAYOUT, players, screen, 50, 76)
 
     previous_movement = pygame.time.get_ticks()
+    tree_game = False
 
     while running:
 
@@ -131,17 +104,59 @@ def play():
 
         if layout.collied()[0]:
             running = False
+        tree_game = layout.collied()[3]
 
         pygame.display.flip()
 
         clock.tick(FPS)
 
+        if tree_game:
+            running = False
+
+    return tree_game
+
+
+def play_tree():
+    bg_image = pygame.image.load("assets/maxresdefault.jpg")
+    bg_image = pygame.transform.scale(bg_image, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
+
+    screen = pygame.display.set_mode(SIZE)
+    pygame.display.set_caption("Bird Run")
+    players = sprites.SpriteSheet("assets/$euphus_young_fly.png")
+
+    layout = sprites.Layout(LAYOUT, players, screen, 76, 50)
+
+    clock = pygame.time.Clock()
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    running = False
+
+        screen.blit(bg_image, (0, 0))
+
+        start_text = BIG_FONT.render("THE", True, BLACK)
+        start_text_2 = BIG_FONT.render("FOREST", True, BLACK)
+        start_text_3 = FONT.render("press \"p\" to start", True, WHITE)
+        screen.blit(start_text, (200, 400))
+        screen.blit(start_text_2, (740, 400))
+        screen.blit(start_text_3, (550, 800))
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
 
 start_screen()
+if play():
+    play_tree()
+    game_over()
 
 while True:
     play()
-    play_tree()
     game_over()
 
 pygame.quit()
