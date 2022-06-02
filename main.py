@@ -11,8 +11,9 @@ def start_screen():
     screen = pygame.display.set_mode(SIZE)
     pygame.display.set_caption("Space Pirates")
     players = sprites.SpriteSheet("assets/$euphus_young.png")
+    flying_players = sprites.SpriteSheet("assets/$euphus_young_fly.png")
 
-    layout = sprites.Layout(STARTING_LAYOUT, players, screen, 50, 76)
+    layout = sprites.Layout(STARTING_LAYOUT, players, screen, 50, 76, flying_players)
 
     clock = pygame.time.Clock()
 
@@ -81,9 +82,10 @@ def play():
     clock = pygame.time.Clock()
     running = True
     players = sprites.SpriteSheet("assets/$euphus_young.png")
+    flying_players = sprites.SpriteSheet("assets/$euphus_young_fly.png")
     explosion_sheet = sprites.SpriteSheet("assets/explosion.png")
     explosion_group = pygame.sprite.Group()
-    layout = sprites.Layout(LAYOUT, players, screen, 50, 76)
+    layout = sprites.Layout(LAYOUT, players, screen, 50, 76, flying_players)
 
     previous_movement = pygame.time.get_ticks()
     tree_game = False
@@ -123,10 +125,13 @@ def play_tree():
     screen = pygame.display.set_mode(SIZE)
     pygame.display.set_caption("Bird Run")
     players = sprites.SpriteSheet("assets/$euphus_young_fly.png")
+    flying_players = sprites.SpriteSheet("assets/$euphus_young_fly.png")
 
-    layout = sprites.Layout(LAYOUT, players, screen, 76, 50)
+    layout = sprites.Layout(LAYOUT, players, screen, 76, 50, flying_players)
 
     clock = pygame.time.Clock()
+
+    previous_movement = pygame.time.get_ticks()
 
     running = True
     while running:
@@ -138,6 +143,7 @@ def play_tree():
                     running = False
 
         screen.blit(bg_image, (0, 0))
+        layout.update(screen, previous_movement)
 
         start_text = BIG_FONT.render("THE", True, BLACK)
         start_text_2 = BIG_FONT.render("FOREST", True, BLACK)

@@ -94,7 +94,7 @@ class Explosion(pygame.sprite.Sprite):
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, sheet, running, display):
+    def __init__(self, x, y, sheet, running, display, sheet_2):
         pygame.sprite.Sprite.__init__(self)
         self.surface = sheet.image_at((0, 95, 47, 47), -1)
         self.surface = pygame.transform.scale(self.surface, (150, 150))
@@ -104,6 +104,9 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = y
         self.run = [sheet.image_at((10, 110, 32, 30), -1), sheet.image_at((57, 110, 32, 30), -1)]
         self.run = [pygame.transform.scale(player, (150, 150)) for player in self.run]
+        self.fly = [sheet_2.image_at((4, 149, 30, 38), -1), sheet_2.image_at((52, 149, 30, 38), -1),
+                    sheet_2.image_at((100, 149, 30, 38), -1), sheet_2.image_at((52, 149, 30, 38), -1)]
+        self.fly = [pygame.transform.scale(player, (150, 150)) for player in self.fly]
         self.frame = 0
         self.frame_rate = 50
         self.previous_update = pygame.time.get_ticks()
@@ -113,15 +116,17 @@ class Player(pygame.sprite.Sprite):
         self.dodging_down = False
         self.display = display
 
-    def update(self):
+    def update(self, level):
         now = pygame.time.get_ticks()
         if now - self.previous_update >= self.image_delay:
             self.previous_update = now
             if self.frame >= len(self.run):
                 self.frame = 0
-            self.image = self.run[self.frame]
+            if level == 1:
+                self.image = self.run[self.frame]
+            else:
+                self.image = self.fly[self.frame]
             self.frame = self.frame + 1
-        #self.image.fill(BLUE)
         self.display.blit(self.image, (self.rect.x, self.rect.y))
 
     def get_keys(self, time):
@@ -231,7 +236,7 @@ class Score:
 
 
 class Layout:
-    def __init__(self, layout, sheet, display, x_multi, y_multi):
+    def __init__(self, layout, sheet, display, x_multi, y_multi, sheet_2):
         pygame.sprite.Sprite.__init__(self)
         self.layout = layout
         self.display = display
@@ -242,6 +247,7 @@ class Layout:
         self.seed_grp = pygame.sprite.Group()
         self.tree_grp = pygame.sprite.Group()
         self.SCORE = 0
+        self.level = 1
         self.letters = ['R', 'T', 'W', 'V', 'Y', 'C', "F", 'H']
 
         for i, row in enumerate(self.layout):
@@ -250,7 +256,7 @@ class Layout:
                 y_val = i * y_multi
 
                 if col == "P":
-                    player = Player(x_val, y_val, sheet, True, self.display)
+                    player = Player(x_val, y_val, sheet, True, self.display, sheet_2)
                     self.player_grp.add(player)
                 if col == "R":
                     car = Car(x_val, y_val, self.display, col, 22)
@@ -291,21 +297,6 @@ class Layout:
                     tree = Tree(x_val, y_val, self.display)
                     self.tree_grp.add(tree)
 
-    def update(self, display, time):
-        for sprite in self.all_sprites.sprites():
-            display.blit(sprite.surface, sprite.rect)
-        for player in self.player_grp.sprites():
-            player.update()
-            player.get_keys(time)
-        for car in self.car_grp.sprites():
-            car.update()
-        for car in self.starting_car_grp.sprites():
-            car.update()
-        for seed in self.seed_grp:
-            seed.update()
-        for tree in self.tree_grp:
-            tree.update()
-
     def collied(self):
         touched = False
         home = False
@@ -323,7 +314,26 @@ class Layout:
             self.SCORE += 15
         if pygame.sprite.spritecollide(player, self.tree_grp, False):
             home = True
+            self.level = 2
+            print(self.level)
         return touched, player.rect.center, self.SCORE, home
+
+    def update(self, display, time):
+        for sprite in self.all_sprites.sprites():
+            display.blit(sprite.surface, sprite.rect)
+        for player in self.player_grp.sprites():
+            player.update(self.level)
+            player.get_keys(time)
+        for car in self.car_grp.sprites():
+            car.update()
+        for car in self.starting_car_grp.sprites():
+            car.update()
+        for seed in self.seed_grp:
+            seed.update()
+        for tree in self.tree_grp:
+            tree.update()
+
+
 
 
 
