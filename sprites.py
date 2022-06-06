@@ -92,7 +92,6 @@ class Explosion(pygame.sprite.Sprite):
             self.rect.center = self.kill_center
 
 
-
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, sheet, running, display, sheet_2):
         pygame.sprite.Sprite.__init__(self)
@@ -117,6 +116,7 @@ class Player(pygame.sprite.Sprite):
         self.display = display
 
     def update(self, level):
+        print(level)
         now = pygame.time.get_ticks()
         if now - self.previous_update >= self.image_delay:
             self.previous_update = now
@@ -304,6 +304,7 @@ class Layout:
 
         collide_list = pygame.sprite.spritecollide(player, self.car_grp, False)
         eat_list = pygame.sprite.spritecollide(player, self.seed_grp, True)
+        tree_list = pygame.sprite.spritecollide(player, self.tree_grp, False)
         for car in self.car_grp:
             if pygame.sprite.spritecollide(car, self.car_grp, False):
                 pass
@@ -312,10 +313,11 @@ class Layout:
             player.rect.y += 2000
         if eat_list:
             self.SCORE += 15
-        if pygame.sprite.spritecollide(player, self.tree_grp, False):
+        if tree_list:
             home = True
             self.level = 2
-            print(self.level)
+            print("collided")
+        print(self.level, "hi")
         return touched, player.rect.center, self.SCORE, home
 
     def update(self, display, time):

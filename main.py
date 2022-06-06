@@ -124,7 +124,7 @@ def play_tree():
 
     screen = pygame.display.set_mode(SIZE)
     pygame.display.set_caption("Bird Run")
-    players = sprites.SpriteSheet("assets/$euphus_young_fly.png")
+    players = sprites.SpriteSheet("assets/$euphus_young.png")
     flying_players = sprites.SpriteSheet("assets/$euphus_young_fly.png")
 
     layout = sprites.Layout(LAYOUT, players, screen, 76, 50, flying_players)
