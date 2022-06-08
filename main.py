@@ -4,6 +4,7 @@ from settings import *
 
 pygame.init()
 
+
 def start_screen():
     bg_image = pg.image.load("assets/background_no_signs.png")
     bg_image = pg.transform.scale(bg_image, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
@@ -30,7 +31,7 @@ def start_screen():
 
         screen.blit(bg_image, (0, 0))
 
-        layout.update(screen, previous_movement)
+        layout.update(screen, previous_movement, 1)
 
         start_text = BIG_FONT.render("BIRD", True, BLACK)
         start_text_2 = BIG_FONT.render("RUN", True, BLACK)
@@ -83,8 +84,6 @@ def play():
     running = True
     players = sprites.SpriteSheet("assets/$euphus_young.png")
     flying_players = sprites.SpriteSheet("assets/$euphus_young_fly.png")
-    explosion_sheet = sprites.SpriteSheet("assets/explosion.png")
-    explosion_group = pygame.sprite.Group()
     layout = sprites.Layout(LAYOUT, players, screen, 50, 76, flying_players)
 
     previous_movement = pygame.time.get_ticks()
@@ -100,7 +99,7 @@ def play():
 
         score = sprites.Score(FONT, screen, layout.collied()[2], 50, 20)
 
-        layout.update(screen, previous_movement)
+        layout.update(screen, previous_movement, 1)
 
         score.draw_score()
 
@@ -127,12 +126,13 @@ def play_tree():
     players = sprites.SpriteSheet("assets/$euphus_young.png")
     flying_players = sprites.SpriteSheet("assets/$euphus_young_fly.png")
 
-    layout = sprites.Layout(LAYOUT, players, screen, 76, 50, flying_players)
+    layout = sprites.Layout(LAYOUT_2, players, screen, 76, 50, flying_players)
 
     clock = pygame.time.Clock()
 
     previous_movement = pygame.time.get_ticks()
 
+    text = True
     running = True
     while running:
         for event in pygame.event.get():
@@ -140,17 +140,18 @@ def play_tree():
                 quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
-                    running = False
+                    text = False
 
         screen.blit(bg_image, (0, 0))
-        layout.update(screen, previous_movement)
+        layout.update(screen, previous_movement, 2)
 
-        start_text = BIG_FONT.render("THE", True, BLACK)
-        start_text_2 = BIG_FONT.render("FOREST", True, BLACK)
-        start_text_3 = FONT.render("press \"p\" to start", True, WHITE)
-        screen.blit(start_text, (200, 400))
-        screen.blit(start_text_2, (740, 400))
-        screen.blit(start_text_3, (550, 800))
+        if text:
+            start_text = BIG_FONT.render("THE", True, BLACK)
+            start_text_2 = BIG_FONT.render("FOREST", True, BLACK)
+            start_text_3 = FONT.render("press \"p\" to start", True, WHITE)
+            screen.blit(start_text, (200, 400))
+            screen.blit(start_text_2, (740, 400))
+            screen.blit(start_text_3, (550, 800))
 
         pygame.display.flip()
         clock.tick(FPS)

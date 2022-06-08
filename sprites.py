@@ -103,8 +103,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.y = y
         self.run = [sheet.image_at((10, 110, 32, 30), -1), sheet.image_at((57, 110, 32, 30), -1)]
         self.run = [pygame.transform.scale(player, (150, 150)) for player in self.run]
-        self.fly = [sheet_2.image_at((4, 149, 30, 38), -1), sheet_2.image_at((52, 149, 30, 38), -1),
-                    sheet_2.image_at((100, 149, 30, 38), -1), sheet_2.image_at((52, 149, 30, 38), -1)]
+        self.fly = [sheet_2.image_at((4, 149, 38, 38), -1), sheet_2.image_at((52, 149, 38, 38), -1),
+                    sheet_2.image_at((100, 149, 38, 38), -1), sheet_2.image_at((52, 149, 38, 38), -1)]
         self.fly = [pygame.transform.scale(player, (150, 150)) for player in self.fly]
         self.frame = 0
         self.frame_rate = 50
@@ -116,30 +116,41 @@ class Player(pygame.sprite.Sprite):
         self.display = display
 
     def update(self, level):
-        print(level)
+        #print(level)
         now = pygame.time.get_ticks()
         if now - self.previous_update >= self.image_delay:
             self.previous_update = now
-            if self.frame >= len(self.run):
-                self.frame = 0
             if level == 1:
+                if self.frame >= len(self.run):
+                    self.frame = 0
                 self.image = self.run[self.frame]
             else:
+                if self.frame >= len(self.fly):
+                    self.frame = 0
                 self.image = self.fly[self.frame]
             self.frame = self.frame + 1
         self.display.blit(self.image, (self.rect.x, self.rect.y))
 
-    def get_keys(self, time):
+    def get_keys(self, time, level):
         self.time = time
         keys = pygame.key.get_pressed()
         self.current_move = pygame.time.get_ticks()
         if self.current_move - self.time > move_delay:
             self.time = self.current_move
-
-            if keys[pygame.K_s] and self.rect.y < 636:
-                self.rect.y += 45
-            if keys[pygame.K_w] and self.rect.y > 180:
-                self.rect.y -= 45
+            if level == 1:
+                if keys[pygame.K_s] and self.rect.y < 636:
+                    self.rect.y += 45
+                if keys[pygame.K_w] and self.rect.y > 180:
+                    self.rect.y -= 45
+            else:
+                if keys[pygame.K_s] and self.rect.y < 636:
+                    self.rect.y += 45
+                if keys[pygame.K_w] and self.rect.y > 180:
+                    self.rect.y -= 45
+                if keys[pygame.K_d] and self.rect.x < 1700:
+                    self.rect.x += 25
+                if keys[pygame.K_a] and self.rect.x > 0:
+                    self.rect.x -= 25
 
 
 class Car(pygame.sprite.Sprite):
@@ -204,6 +215,21 @@ class Seed(pygame.sprite.Sprite):
         self.display.blit(self.seed, (self.rect.x, self.rect.y))
 
 
+class Nut(pygame.sprite.Sprite):
+    def __init__(self, x, y, display):
+        pygame.sprite.Sprite.__init__(self)
+        self.seed = pygame.image.load("assets/Seeds_Cereals.png")
+        self.seed = pygame.transform.scale(self.seed, (75, 75))
+        self.rect = self.seed.get_rect()
+        self.display = display
+        self.rect.x = x
+        self.rect.y = y - 500
+
+    def update(self):
+        self.rect.y += 10
+        self.display.blit(self.seed, (self.rect.x, self.rect.y))
+
+
 class Tree(pygame.sprite.Sprite):
     def __init__(self, x, y, display):
         pygame.sprite.Sprite.__init__(self)
@@ -215,7 +241,7 @@ class Tree(pygame.sprite.Sprite):
         self.rect.y = y - 200
 
     def update(self):
-        self.rect.x -= 10
+        self.rect.x -= 7
         self.display.blit(self.tree, (self.rect.x, self.rect.y))
 
 
@@ -246,8 +272,10 @@ class Layout:
         self.all_sprites = pygame.sprite.Group()
         self.seed_grp = pygame.sprite.Group()
         self.tree_grp = pygame.sprite.Group()
+        self.nut_grp = pygame.sprite.Group()
         self.SCORE = 0
         self.level = 1
+        self.home = False
         self.letters = ['R', 'T', 'W', 'V', 'Y', 'C', "F", 'H']
 
         for i, row in enumerate(self.layout):
@@ -296,10 +324,12 @@ class Layout:
                 if col == "2":
                     tree = Tree(x_val, y_val, self.display)
                     self.tree_grp.add(tree)
+                if col == "3":
+                    nut = Nut(x_val, y_val, self.display)
+                    self.nut_grp.add(nut)
 
     def collied(self):
         touched = False
-        home = False
         player = self.player_grp.sprite
 
         collide_list = pygame.sprite.spritecollide(player, self.car_grp, False)
@@ -307,25 +337,25 @@ class Layout:
         tree_list = pygame.sprite.spritecollide(player, self.tree_grp, False)
         for car in self.car_grp:
             if pygame.sprite.spritecollide(car, self.car_grp, False):
-                pass
+                car.speed = 15
         if collide_list:
             touched = True
             player.rect.y += 2000
         if eat_list:
             self.SCORE += 15
         if tree_list:
-            home = True
+            self.home = True
             self.level = 2
-            print("collided")
-        print(self.level, "hi")
-        return touched, player.rect.center, self.SCORE, home
+            print(self.home)
+        #print(self.level, "hi")
+        return touched, player.rect.center, self.SCORE, self.home
 
-    def update(self, display, time):
+    def update(self, display, time, level):
         for sprite in self.all_sprites.sprites():
             display.blit(sprite.surface, sprite.rect)
         for player in self.player_grp.sprites():
-            player.update(self.level)
-            player.get_keys(time)
+            player.update(level)
+            player.get_keys(time, level)
         for car in self.car_grp.sprites():
             car.update()
         for car in self.starting_car_grp.sprites():
@@ -334,6 +364,8 @@ class Layout:
             seed.update()
         for tree in self.tree_grp:
             tree.update()
+        for nut in self.nut_grp:
+            nut.update()
 
 
 
