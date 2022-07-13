@@ -223,11 +223,13 @@ class Nut(pygame.sprite.Sprite):
         self.rect = self.seed.get_rect()
         self.display = display
         self.rect.x = x
-        self.rect.y = y - 500
+        self.rect.y = y - random.randint(500, 2000)
 
     def update(self):
         self.rect.y += 10
         self.display.blit(self.seed, (self.rect.x, self.rect.y))
+        if self.rect.y > 1000:
+            self.rect.y = random.randint(500, 2000)*-1
 
 
 class Tree(pygame.sprite.Sprite):
@@ -350,7 +352,7 @@ class Layout:
         #print(self.level, "hi")
         return touched, player.rect.center, self.SCORE, self.home
 
-    def update(self, display, time, level):
+    def update(self, display, time, level, text):
         for sprite in self.all_sprites.sprites():
             display.blit(sprite.surface, sprite.rect)
         for player in self.player_grp.sprites():
@@ -364,8 +366,9 @@ class Layout:
             seed.update()
         for tree in self.tree_grp:
             tree.update()
-        for nut in self.nut_grp:
-            nut.update()
+        if text == False:
+            for nut in self.nut_grp:
+                nut.update()
 
 
 

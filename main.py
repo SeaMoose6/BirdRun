@@ -31,7 +31,7 @@ def start_screen():
 
         screen.blit(bg_image, (0, 0))
 
-        layout.update(screen, previous_movement, 1)
+        layout.update(screen, previous_movement, 1, running)
 
         start_text = BIG_FONT.render("BIRD", True, BLACK)
         start_text_2 = BIG_FONT.render("RUN", True, BLACK)
@@ -99,7 +99,7 @@ def play():
 
         score = sprites.Score(FONT, screen, layout.collied()[2], 50, 20)
 
-        layout.update(screen, previous_movement, 1)
+        layout.update(screen, previous_movement, 1, running)
 
         score.draw_score()
 
@@ -143,7 +143,8 @@ def play_tree():
                     text = False
 
         screen.blit(bg_image, (0, 0))
-        layout.update(screen, previous_movement, 2)
+
+        layout.update(screen, previous_movement, 2, text)
 
         if text:
             start_text = BIG_FONT.render("THE", True, BLACK)
